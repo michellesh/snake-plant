@@ -2,9 +2,11 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#include "Leaf.h"
+//#define DEBUG
 
-// PIN_<leaf #><side a/b>
+#include "Leaf.h"
+#include "colors.h"
+
 #define PIN_1A 2
 #define PIN_1B 4
 #define PIN_2A 18
@@ -24,11 +26,6 @@ int NUM_LEDS_TOTAL =
 
 Leaf leaves[NUM_LEAVES];
 CRGB *leds;
-
-// CRGB colors[] = {CRGB::White, CRGB::Yellow, CRGB::Green, CRGB::Blue,
-//                  CRGB::Purple};
-CRGB colors[] = {CRGB::Red, CRGB::Blue, CRGB::Green, CRGB::Yellow,
-                 CRGB::Purple};
 
 void setup() {
   Serial.begin(115200);
@@ -65,13 +62,16 @@ void setup() {
     leaves[leafIndex] = leaf;
     offset += (2 * leaf.numLEDs);
   }
-
-  FastLED.setBrightness(50);
 }
 
 void loop() {
-  for (int leafIndex = 0; leafIndex < NUM_LEAVES; leafIndex++) {
-    leaves[leafIndex].setAll(colors[leafIndex]);
-  }
+  cycleColorPalette();
+  twinkle();
   FastLED.show();
+}
+
+void setAllLeaves() {
+  for (int leafIndex = 0; leafIndex < NUM_LEAVES; leafIndex++) {
+    leaves[leafIndex].setAll(leafColors[leafIndex]);
+  }
 }
