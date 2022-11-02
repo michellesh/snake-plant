@@ -2,10 +2,9 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-//#define DEBUG
-
 #include "Leaf.h"
 #include "colors.h"
+#include "utils.h"
 
 #define PIN_1A 2
 #define PIN_1B 4
@@ -20,12 +19,12 @@
 
 #define NUM_LEAVES 5
 
-int NUM_LEDS[] = {21, 25, 30, 35, 40};
-int NUM_LEDS_TOTAL =
-    2 * (NUM_LEDS[0] + NUM_LEDS[1] + NUM_LEDS[2] + NUM_LEDS[3] + NUM_LEDS[4]);
-
 Leaf leaves[NUM_LEAVES];
 CRGB *leds;
+
+// number of LEDs on each side of each leaf
+int NUM_LEDS[] = {21, 25, 30, 35, 40};
+int NUM_LEDS_TOTAL = 2 * sum(NUM_LEDS, NUM_LEAVES);
 
 void setup() {
   Serial.begin(115200);
@@ -55,11 +54,10 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, PIN_5B>(leds, offset, NUM_LEDS[4]);
 
   offset = 0;
-  for (int leafIndex = 0; leafIndex < NUM_LEAVES; leafIndex++) {
-    Leaf leaf = {leafIndex, NUM_LEDS[leafIndex], &leds[offset],
-                 &leds[offset + NUM_LEDS[leafIndex]]};
+  for (int i = 0; i < NUM_LEAVES; i++) {
+    Leaf leaf = {i, NUM_LEDS[i], &leds[offset], &leds[offset + NUM_LEDS[i]]};
 
-    leaves[leafIndex] = leaf;
+    leaves[i] = leaf;
     offset += (2 * leaf.numLEDs);
   }
 }
@@ -71,7 +69,7 @@ void loop() {
 }
 
 void setAllLeaves() {
-  for (int leafIndex = 0; leafIndex < NUM_LEAVES; leafIndex++) {
-    leaves[leafIndex].setAll(leafColors[leafIndex]);
+  for (int i = 0; i < NUM_LEAVES; i++) {
+    leaves[i].setAll(leafColors[i]);
   }
 }
